@@ -67,6 +67,8 @@
 #define CRTDLLNAME   _T("ucrtbase.dll")
 #elif _MSC_VER == 1927 	// VS 2019 16.7
 #define CRTDLLNAME   _T("ucrtbase.dll")
+#elif _MSC_VER >= 1933 	// VS 2022
+#define CRTDLLNAME   _T("ucrtbase.dll")//BHA
 #else
 #error Unsupported compiler
 #endif

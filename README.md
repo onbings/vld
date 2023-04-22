@@ -19,6 +19,50 @@ We encourage developers who've added their own features, or fixed bugs they've f
 * Based on [Source code](https://github.com/oneiric/vld)
 * [Source code](https://github.com/onbings/vld)
 
+## Use the prebuilt binaries
+
+You can find in the package directory  a release prebuilt version for Win32 and Win64 Os.
+These one can be used easily with Cmake (see below)
+
+## Build from the sources
+
+Open the solution file 
+* vld_vs2022 Visual studio 2022 (OnBings) 
+* vld_vs2022 Visual studio 2019 (https://github.com/oneiric/vld)
+and build the solution
+The result files will be located in the src/bin subdirectory
+
+REM: You need to have the MFC lib installed to be able to build the project
+
+
+
+## Usage with CMAKE (OnBings)
+\#\#\# VLD \#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#
+add_library(vld SHARED IMPORTED) \# or STATIC instead of SHARED
+set_target_properties(vld PROPERTIES
+  IMPORTED_LOCATION "C:/pro/github/vld/package/Win64/vld_x64.dll"		\#Win32/vld_x86.dll for 32 bits
+  IMPORTED_IMPLIB	"C:/pro/github/vld/package/Win64/vld.lib"
+  INTERFACE_INCLUDE_DIRECTORIES "C:/pro/github/vld/package/include"
+)
+\# Error wil be displayed in visual studio immediate windows (use ctrl-alt-i to make it appears) and in c:\tm\vld.txt (see default vld.ini)
+get_target_property(DllPath vld IMPORTED_LOCATION)
+get_filename_component(DllDir ${DllPath} DIRECTORY)
+
+add_custom_command(TARGET bofstd-tests POST_BUILD    
+    \#COMMAND ${CMAKE_COMMAND} -E cmake_echo_color --cyan \"=DllPath================>\"
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different ${DllPath}  $<TARGET_FILE_DIR:bofstd-tests>
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different ${DllDir}/dbghelp.dll $<TARGET_FILE_DIR:bofstd-tests>
+	COMMAND ${CMAKE_COMMAND} -E copy_if_different ${DllDir}/Microsoft.DTfW.DHL.manifest $<TARGET_FILE_DIR:bofstd-tests>
+	COMMAND ${CMAKE_COMMAND} -E copy_if_different ${DllDir}/../vld.ini $<TARGET_FILE_DIR:bofstd-tests>
+)   
+\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#
+
+target_link_libraries(bofstd-tests
+  PRIVATE
+    ONBINGS::bofstd-objects
+    GTest::GTest
+--->	$<$<AND:$<BOOL:${WIN32}>,$<CONFIG:Debug>>:vld>
+)
 Copyright © 2005-2021 VLD Team
 
  [1]: https://github.com/oneiric/vld/blob/master/COPYING.txt
